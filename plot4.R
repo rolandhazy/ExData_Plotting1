@@ -14,12 +14,23 @@ subset = dataset[dataset$Date %in% c("1/2/2007", "2/2/2007"), ]
 subset$DateTime = paste(subset$Date, subset$Time)
 subset$DateTime = strptime(subset$DateTime, "%d/%m/%Y %H:%M:%S")
 
-# create time series object
+# create time series objects
 library(zoo)
 Sys.setlocale("LC_ALL","English") # change locale to English
-ts = zoo(subset[, 7:9], subset$DateTime)
 
+topleft = zoo(subset$Global_active_power, subset$DateTime)
+bottomleft = zoo(subset[, 7:9], subset$DateTime)
+topright = zoo(subset$Voltage, subset$DateTime)
+bottomright = zoo(subset$Global_reactive_power, subset$DateTime)
+
+# create plots
 png("plot4.png", 480, 480)
-plot(ts, screens = 1, col = c("black", "red", "blue"), xlab = "", ylab = "Energy sub metering")
-legend("topright", names(subset)[7:9], lty = 1, col = c("black", "red", "blue"), border = "none")
+par(mfcol = c(2,2))
+
+plot(topleft, xlab = "", ylab = "Global Active Power")
+plot(bottomleft, screens = 1, col = c("black", "red", "blue"), xlab = "", ylab = "Energy sub metering")
+legend("topright", names(subset)[7:9], lty = 1, col = c("black", "red", "blue"), bty = "n")
+plot(topright, ylab = "Voltage", xlab = "datetime")
+plot(bottomright, ylab = names(subset)[4], xlab = "datetime")
+
 dev.off()
